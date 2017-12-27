@@ -17,12 +17,13 @@
  * <http://www.doctrine-project.org>.
  */
 
-namespace WShafer\ZfDoctrineModule;
+namespace WShafer\ZfDoctrineFixtures;
 
 use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputOption;
+use WShafer\ZfDoctrineFixtures\Command\ConfigInterface;
 use Zend\ModuleManager\Feature\ControllerProviderInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ModuleManager\Feature\InitProviderInterface;
@@ -42,10 +43,8 @@ use Zend\Stdlib\ArrayUtils;
  * @author  Marco Pivetta <ocramius@gmail.com>
  */
 class Module implements
-    ControllerProviderInterface,
     ConfigProviderInterface,
-    InitProviderInterface,
-    DependencyIndicatorInterface
+    InitProviderInterface
 {
     /**
      * {@inheritDoc}
@@ -65,7 +64,7 @@ class Module implements
      */
     public function getConfig()
     {
-        return include __DIR__ . '/../../config/module.config.php';
+        return include __DIR__ . '/../config/module.config.php';
     }
 
     /**
@@ -92,11 +91,28 @@ class Module implements
 
         $commands = [
             'doctrine.fixture.import',
+            'doctrine.fixture.list',
         ];
 
         foreach ($commands as $commandName) {
             /* @var $command \Symfony\Component\Console\Command\Command */
             $command = $serviceLocator->get($commandName);
+
+            $command->getDefinition()->addOption(new InputOption(
+                'object-manager',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'The name of the object manager to use.',
+                'doctrine.entitymanager.orm_default'
+            ));
+
+            if ($command instanceof ConfigInterface) {
+                $config = $serviceLocator->get('config');
+                $doctrineConfig = $config['doctrine'] ?? [];
+
+                $command->setConfig($doctrineConfig);
+            }
+
             $cli->add($command);
         }
     }

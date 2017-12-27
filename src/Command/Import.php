@@ -1,13 +1,14 @@
 <?php
 
-namespace WShafer\ZfDoctrineModule;
+namespace WShafer\ZfDoctrineFixtures\Command;
 
-use Symfony\Component\Console\Command\Command;
+use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
+use Doctrine\Common\DataFixtures\Purger\ORMPurger;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Import extends Command
+class Import extends ListFixtures
 {
     protected function configure()
     {
@@ -20,7 +21,16 @@ class Import extends Command
     {
         /** @var EntityManagerInterface $em */
         $em = $this->getHelper('em')->getEntityManager();
+        /** @var ORMPurger $purger */
+        $purger = new ORMPurger();
 
-        $output->writeln('Hi');
+        /** @var ORMExecutor $executor */
+        $executor = new ORMExecutor($em, $purger);
+
+        $this->loadFixtures($input->getOption('object-manager'));
+
+        $executor->execute($this->loader->getFixtures());
+
+        $output->writeln('<info>Complete</info>');
     }
 }
