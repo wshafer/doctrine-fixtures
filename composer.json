@@ -16,5 +16,10 @@
             "name": "wshafer",
             "email": "shafer_w2002@yahoo.com"
         }
-    ]
+    ],
+    "autoload": {
+        "psr-4": {
+            "WShafer\\ZfDoctrineFixtures": "src/"
+        }
+    },
 }
