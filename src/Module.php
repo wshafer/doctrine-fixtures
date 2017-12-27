@@ -20,19 +20,12 @@
 namespace WShafer\ZfDoctrineFixtures;
 
 use Symfony\Component\Console\Helper\DialogHelper;
-use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputOption;
 use WShafer\ZfDoctrineFixtures\Command\ConfigInterface;
-use Zend\ModuleManager\Feature\ControllerProviderInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ModuleManager\Feature\InitProviderInterface;
-use Zend\ModuleManager\Feature\DependencyIndicatorInterface;
 use Zend\ModuleManager\ModuleManagerInterface;
 use Zend\EventManager\EventInterface;
-use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
-use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
-use Zend\Stdlib\ArrayUtils;
 
 /**
  * Base module for Doctrine ORM.
@@ -75,13 +68,7 @@ class Module implements
         return ['DoctrineModule'];
     }
 
-    /**
-     * Initializes the console with additional commands from the ORM, DBAL and (optionally) DBAL\Migrations
-     *
-     * @param \Zend\EventManager\EventInterface $event
-     *
-     * @return void
-     */
+
     public function initializeConsole(EventInterface $event)
     {
         /* @var $cli \Symfony\Component\Console\Application */
@@ -109,7 +96,6 @@ class Module implements
             if ($command instanceof ConfigInterface) {
                 $config = $serviceLocator->get('config');
                 $doctrineConfig = $config['doctrine'] ?? [];
-
                 $command->setConfig($doctrineConfig);
             }
 
